@@ -1,4 +1,4 @@
-package com.movie_baba;
+package com.moviebaba;
 
 import android.app.Application;
 

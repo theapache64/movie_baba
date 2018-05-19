@@ -1,10 +1,19 @@
 // @flow
 import React from 'react';
-import {Image, Text, View, StyleSheet, ImageBackground, Button, TouchableHighlight} from 'react-native';
-import type {Movie} from '../models/Movie';
-import FontAwesome, {Icons} from 'react-native-fontawesome';
+import {
+    Image,
+    Text,
+    View,
+    StyleSheet,
+    ImageBackground,
+    TouchableHighlight,
+    TouchableOpacity,
+    Linking,
+} from 'react-native';
+import FontAwesome, { Icons } from 'react-native-fontawesome';
 import * as Colors from 'react-native-material-color';
-import {COLOR_PRIMARY, COLOR_PRIMARY_DARK} from '../styles/styles';
+import type { Movie } from '../models/Movie';
+import { COLOR_PRIMARY, COLOR_PRIMARY_DARK } from '../styles/styles';
 
 type PropTypes = {
     movie: Movie,
@@ -22,18 +31,31 @@ export default class MovieScreen extends React.Component<PropTypes> {
         header: null,
     };
 
+    onViewDetails = () => {
+        const { url } = this.props.navigation.state.params.movie;
+
+        Linking.canOpenURL(url).then((isSup) => {
+            if (isSup) {
+                Linking.openURL(url);
+            }
+        }).catch(err => console.error('An error happened', err));
+    };
+
     render() {
-        // const movie = this.props.navigation.state.params.movie;
+        const { movie } = this.props.navigation.state.params;
         return (
             <ImageBackground
                 style={styles.container}
-                source={require('../assets/images/black_panther.jpg')}
+                source={{ uri: movie.poster_url }}
             >
                 <View
-                    style={[styles.container, {backgroundColor: 'rgba(0, 0, 0, 0.5)'}]}
+                    style={[styles.container, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}
                 >
-                    {/*Desciption*/}
-                    <View style={{flexDirection: 'row'}}>
+
+
+                    {/* Desciption */}
+                    <View style={{ flexDirection: 'row' }}>
+
 
                         {/* Poster */}
                         <Image
@@ -44,7 +66,7 @@ export default class MovieScreen extends React.Component<PropTypes> {
                                 backgroundColor: 'transparent',
                                 resizeMode: Image.resizeMode.contain,
                             }}
-                            source={require('../assets/images/black_panther.jpg')}
+                            source={{ uri: movie.poster_url }}
                         />
 
                         {/* Other details */}
@@ -52,40 +74,56 @@ export default class MovieScreen extends React.Component<PropTypes> {
                             flex: 1,
                             marginTop: 6,
                             marginEnd: 5,
-                            height: 210,
                             flexDirection: 'column',
                             flexWrap: 'wrap',
                         }}
                         >
 
                             {/* Title */}
-                            <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Black Panther</Text>
+                            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>{movie.name}</Text>
 
                             {/* Genree */}
-                            <Text style={{color: 'white'}}>Action, Drama</Text>
+                            <Text style={{ color: 'white' }}>{movie.genre}</Text>
 
                             {/* Rating */}
-                            <Text style={{color: 'white', marginTop: 10, marginBottom: 6}}>
+                            <Text style={{ color: 'white', marginTop: 10, marginBottom: 6 }}>
                                 <FontAwesome
-                                    style={{color: Colors.YELLOW[500]}}
-                                >{Icons.star}
-                                </FontAwesome> 5.6
+                                    style={{ color: Colors.WHITE }}
+                                >{Icons.users}
+                                </FontAwesome> {movie.stars}
                             </Text>
 
-                            {/*Directed by*/}
-                            <Text style={{color: 'white', marginBottom:5}}>Directed by : Shifar</Text>
+                            {/* Year */}
+                            <Text style={{ color: 'white', marginTop: 4, marginBottom: 6 }}>
+                                <FontAwesome
+                                    style={{ color: Colors.WHITE }}
+                                >{Icons.calendar}
+                                </FontAwesome> {movie.year}
+                            </Text>
+
+                            {/* Directed by */}
+                            <Text style={{ color: 'white', marginBottom: 10 }}>Directed by : {movie.director}</Text>
 
 
-                            <View style={{flex:1,flexDirection: 'row',alignItems:'flex-end',justifyContent:'flex-end'}}>
+                            {/* View details */}
+                            <View style={{
+                                flex: 1, flexDirection: 'column', alignItems: 'flex-start',
+                            }}
+                            >
                                 <TouchableHighlight
-                                    style={{padding: 4, paddingEnd:10,paddingLeft:10,borderRadius:5, backgroundColor: COLOR_PRIMARY}}
+                                    style={{
+                                        padding: 4,
+                                        paddingEnd: 10,
+                                        paddingLeft: 10,
+                                        borderRadius: 5,
+                                        backgroundColor: COLOR_PRIMARY,
+                                    }}
                                     onPress={this.onViewDetails}
                                     underlayColor={COLOR_PRIMARY_DARK}
                                 >
-                                    <Text style={{color: 'white'}}>View Details</Text>
+                                    <Text style={{ color: 'white' }}>View Details</Text>
                                 </TouchableHighlight>
                             </View>
-
 
 
                         </View>
@@ -94,18 +132,37 @@ export default class MovieScreen extends React.Component<PropTypes> {
                     </View>
 
 
-                    <View>
-                        <Text style={{color:'white', backgroundColor:'red'}}>Hello</Text>
+                    <View style={{ margin: 10 }}>
+                        <Text style={{
+                            color: 'white', fontWeight: 'bold', fontSize: 14, marginBottom: 10,
+                        }}
+                        >Plot
+                        </Text>
+                        <Text style={{ color: 'white' }}>
+                            {movie.plot}
+                        </Text>
                     </View>
 
+
+                    <View style={{
+                        flex: 1,
+                        margin: 20,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'flex-end',
+                    }}
+                    >
+                        <TouchableOpacity
+                            style={{ padding: 10 }}
+                            onPress={() => this.props.navigation.goBack()}
+                        >
+                            <FontAwesome style={{ color: 'white', fontSize: 30 }}>{Icons.timesCircle}</FontAwesome>
+                        </TouchableOpacity>
+                    </View>
 
 
                 </View>
             </ImageBackground>
         );
-    }
-
-    onViewDetails = () => {
-
     }
 }

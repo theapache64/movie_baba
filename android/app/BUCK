@@ -45,12 +45,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.movie_baba",
+    package = "com.moviebaba",
 )
 
 android_resource(
     name = "res",
-    package = "com.movie_baba",
+    package = "com.moviebaba",
     res = "src/main/res",
 )
 

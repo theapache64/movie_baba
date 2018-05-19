@@ -10,6 +10,7 @@ import SplashVC from './core/views/SplashVC';
 import HomeVC from './core/views/HomeVC';
 import MovieVC from './core/views/MovieVC';
 
+
 const StackRoot = createStackNavigator({
     // SplashVC screen
     Splash: {
@@ -30,7 +31,7 @@ const StackRoot = createStackNavigator({
     },
 
 }, {
-    initialRouteName: 'MovieVC',
+    initialRouteName: 'Splash',
 });
 
 const App = () => <StackRoot />;

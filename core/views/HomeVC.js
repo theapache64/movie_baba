@@ -1,9 +1,19 @@
+// @flow
+
 import React from 'react';
-import BaseContainer from '../widgets/BaseContainer';
-import * as Styles from '../styles/styles';
 import Color from 'react-native-material-color';
 import TagInput from 'react-native-tag-input';
-import { ActivityIndicator, Platform, StatusBar, Text, TouchableHighlight, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    Platform,
+    StatusBar,
+    Text,
+    TouchableHighlight,
+    View,
+} from 'react-native';
+import BaseContainer from '../widgets/BaseContainer';
+import * as Styles from '../styles/styles';
 import * as SearchResponse from '../api/SearchResponse';
 
 
@@ -14,25 +24,41 @@ const horizontalInputProps = {
     placeholderTextColor: Color.WHITE,
     marginTop: 3,
     style: {
+        color: 'white',
         fontSize: 16,
         marginVertical: Platform.OS === 'ios' ? 10 : -10,
     },
 };
-type PropType = {}
+type PropType = {
+    navigation: Object,
+}
 type StateType = {
     keywords: Array<string>,
     text: string,
-    isLoading: boolean,
-    loadingMessage: string
+    isLoading: boolean
 }
 export default class HomeVC extends React.Component<PropType, StateType> {
     static navigationOptions = {
         header: null,
     };
+
+
+    constructor(props: PropType) {
+        super(props);
+        this.state = {
+            keywords: ['Tony Stark'],
+            text: '',
+            isLoading: false,
+        };
+
+        (this: any).onGuessPressed = this.onGuessPressed.bind(this);
+        (this: any).onKeywordChanged = this.onKeywordChanged.bind(this);
+    }
+
     onChangeText = (text: string) => {
         this.setState({ text });
 
-        const tagWhen = [',', '-', ' ', ';'];
+        const tagWhen = [',', '-', ';'];
         if (text.length > 1) {
             const lastTypedChar = text.charAt(text.length - 1);
 
@@ -46,46 +72,50 @@ export default class HomeVC extends React.Component<PropType, StateType> {
         }
     };
 
-    constructor(props: PropType) {
-        super(props);
-        this.state = {
-            keywords: ['Ironman', 'Superman', 'Spiderman'],
-            text: '',
-            isLoading: false,
-            loadingMessage: 'Let me guess!! ',
-        };
-        this.onGuessPressed = this.onGuessPressed.bind(this);
-        this.onKeywordChanged = this.onKeywordChanged.bind(this);
-    }
-
     onKeywordChanged(keywords: Array<string>) {
         console.log(`Keyword changed to ${keywords.toString()}`);
         this.setState({ keywords });
     }
 
     onGuessPressed() {
-        this.setState({
-            isLoading: true,
-        });
-
         // Getting movie data
-        const { keywords } = this.state;
+        const { keywords, text } = this.state;
+        if (text.length > 0) {
+            keywords.push(this.state.text);
+        }
 
-        fetch(`http://theapache64.com/movie_db/search?keyword=${encodeURIComponent(keywords)}`)
-            .then(resp => resp.json())
-            .then((json) => {
-                const response = SearchResponse.parseSearch(json);
-                this.setState({
-                    isLoading: false,
-                });
-                this.props.navigation.navigate('MovieVC', { movie: response.data });
-            })
-            .catch((error) => {
-                alert(error);
-                this.setState({
-                    isLoading: false,
-                });
+        if (keywords.length > 0) {
+            this.setState({
+                isLoading: true,
             });
+
+
+            fetch(`http://theapache64.com/movie_db/search?keyword=${encodeURIComponent(keywords.toString())}`)
+                .then(resp => resp.json())
+                .then((json) => {
+                    const response = SearchResponse.parseSearch(json);
+                    this.setState({
+                        isLoading: false,
+                    });
+
+                    if (response.error !== true) {
+                        // Clearing old data
+                        this.setState({ keywords: [], text: '' });
+
+                        this.props.navigation.navigate('MovieVC', { movie: response.data });
+                    } else {
+                        Alert.alert('Error', response.message);
+                    }
+                })
+                .catch((error) => {
+                    alert(error);
+                    this.setState({
+                        isLoading: false,
+                    });
+                });
+        } else {
+            Alert.alert('Uh ho!', 'Please enter some keywords');
+        }
     }
 
     render() {
@@ -110,7 +140,7 @@ export default class HomeVC extends React.Component<PropType, StateType> {
                     }}
                     >
                         <ActivityIndicator color={Color.WHITE} style={{ marginBottom: 20 }} size="large" />
-                        <Text style={{ color: Color.WHITE }}>Guessing</Text>
+                        <Text style={{ color: Color.WHITE }}>Baba is guessing...</Text>
                     </View>
                 }
 
@@ -136,7 +166,7 @@ export default class HomeVC extends React.Component<PropType, StateType> {
                         >
                             <TagInput
                                 value={this.state.keywords}
-                                onChange={this.onKeywordChanged}
+                                onChange={arr => this.onKeywordChanged(arr)}
                                 labelExtractor={tag => tag}
                                 text={this.state.text}
                                 onChangeText={this.onChangeText}
