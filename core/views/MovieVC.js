@@ -32,7 +32,8 @@ export default class MovieScreen extends React.Component<PropTypes> {
     };
 
     onViewDetails = () => {
-        const { url } = this.props.navigation.state.params.movie;
+        const imdbId = this.props.navigation.state.params.movie.imdb_id;
+        const url = `https://www.imdb.com/title/${imdbId}/`;
 
         Linking.canOpenURL(url).then((isSup) => {
             if (isSup) {

@@ -158,7 +158,7 @@ export default class HomeVC extends React.Component<PropType, StateType> {
                         <View style={{
                             height: 54,
                             borderColor: '#fff',
-                            borderWidth: 1,
+                            borderWidth: 2,
                             marginBottom: 10,
                             borderRadius: 5,
                             backgroundColor: 'transparent',
@@ -189,7 +189,7 @@ export default class HomeVC extends React.Component<PropType, StateType> {
                             onPress={this.onGuessPressed}
                             style={{
                                 borderColor: '#fff',
-                                borderWidth: 1,
+                                borderWidth: 2,
                                 marginBottom: 10,
                                 borderRadius: 5,
                                 padding: 10,
